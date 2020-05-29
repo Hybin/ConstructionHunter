@@ -1,3 +1,12 @@
 {
-    "train_data": "../data/train/{}"
+    "train_data": "../data/train/{}",
+    "test_data": "../data/test/{}",
+    "train_data_dir": "../data/train",
+    "test_data_dir": "../data/test",
+    "stanford_core_nlp": "../libraries/stanford-corenlp",
+    "core_nlp_host": "http://localhost",
+    "core_nlp_port": 8088,
+    "train_dict": "../data/dictionary/train_vocabulary.pk",
+    "labels": ["B-C", "I-C", "B-V", "I-V", "O"],
+    "model_path": "../model/model.bin.{}"
 }

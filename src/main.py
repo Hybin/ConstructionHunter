@@ -1,19 +1,30 @@
 from config import Config
 from processor import Processor
+from hades import Hades
+from hermes import Hermes
+from utils import *
 import argparse
 import os
 
 if __name__ == "__main__":
-    # Load the configuration
-    conf = Config()
-
     # Get the path and form of a construction from command-line
     # parser = argparse.ArgumentParser(description="Automatic Recognizer for Chinese sentential construction")
     # parser.add_argument("-f", "--file", help="The path (specifically file name) of the raw material")
     # args = parser.parse_args()
 
-    processor = Processor(conf)
+    # Load the logger
+    hermes = Hermes("Hades").on()
 
-    files = os.listdir("../data/train")
-    for file in files[:1]:
-        print(processor.process_on_constants(file))
+    # Load the configuration
+    hermes.info("Load the Config...")
+    conf = Config()
+    hermes.info("Loading the Config...Finished")
+
+    # Load the processor
+    hermes.info("Loading the Processor...")
+    processor = Processor(conf)
+    hermes.info("Loading the Processor...Finished!")
+
+    hermes.info("Now, let's begin!")
+    hades = Hades(conf, processor)
+    hades.process_test_data()

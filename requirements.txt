@@ -1,1 +1,6 @@
 tqdm
+stanfordcorenlp
+keras
+keras_contrib
+scikit-learn
+numpy

@@ -5,6 +5,9 @@
 
 data/*
 model/*
+libraries/*
+log/*
+
 
 __pycache__
 __pycache__/*
