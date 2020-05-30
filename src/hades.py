@@ -1,8 +1,13 @@
 from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
 from sword import Sword
 from sklearn.model_selection import train_test_split
+from hermes import Hermes
+from tqdm import tqdm
+from seqeval.metrics import classification_report
 from utils import *
 import numpy as npy
+import pickle
 
 
 class Hades(object):
@@ -10,6 +15,7 @@ class Hades(object):
         self.conf = conf
         self.processor = processor
         self.sword = Sword(conf)
+        self.hermes = Hermes("Hades").on()
 
     def process_train_data(self):
         """
@@ -31,14 +37,16 @@ class Hades(object):
         word_feature = pad_sequences(word_feature, max_len)
         cxn_feature = pad_sequences(cxn_feature, max_len)
 
-        y = pad_sequences(labels, max_len, value=5)
-        y = y.reshape(y.shape[0], y.shape[1], 1)
+        seq_features = []
+        for seq in cxn_feature:
+            seq_features.append(to_categorical(seq, num_classes=4))
 
-        x = []
-        for index, sequence in zip(word_feature, cxn_feature):
-            x.append(merge(index, sequence))
+        seq_features = npy.array(seq_features)
 
-        x = npy.array(x)
+        y = pad_sequences(labels, max_len, value=4)
+        y = [to_categorical(i, num_classes=5) for i in y]
+
+        x = merge(word_feature, seq_features)
 
         return x, y
 
@@ -49,29 +57,33 @@ class Hades(object):
         """
         sequences = self.processor.up()
 
-        word_feature, cxn_feature, max_len = [], [], 0
+        sentences, word_feature, cxn_feature, max_len = [], [], [], 0
         for sentence, index, sequence in sequences:
             if max_len < len(sentence):
                 max_len = len(sentence)
 
             word_feature.append(index)
             cxn_feature.append(sequence)
+            sentences.append(sentence)
         max_len += 1
 
         word_feature = pad_sequences(word_feature, max_len)
         cxn_feature = pad_sequences(cxn_feature, max_len)
-        print(word_feature.shape)
-        print(cxn_feature.shape)
 
-        x = []
-        for index, sequence in zip(word_feature, cxn_feature):
-            x.append(merge(index, sequence))
+        seq_features = []
+        for seq in cxn_feature:
+            seq_features.append(to_categorical(seq, num_classes=4))
 
-        x = npy.array(x)
+        seq_features = npy.array(seq_features)
+        x = merge(word_feature, seq_features)
 
-        return x
+        return sentences, x
 
     def train(self):
+        """
+        Train the model
+        :return:
+        """
         # Model Configuration
         model = self.sword.draw()
 
@@ -80,21 +92,58 @@ class Hades(object):
 
         # Create the train data and validate data
         train_x, test_x, train_y, test_y = train_test_split(x, y, test_size=0.3, random_state=24)
+        train_x_kanji, train_x_cxn = resolve(train_x)
+
+        with open(self.conf.validate_set.format("hades"), "wb") as fp:
+            pickle.dump((test_x, test_y), fp)
+        fp.close()
 
         # Train the model
-        model.fit(train_x, train_y, batch_size=16, epochs=self.sword.epochs, validation_data=[test_x, test_y])
+        model.fit([train_x_kanji, train_x_cxn], npy.array(train_y), batch_size=16, epochs=self.sword.epochs, validation_split=0.2)
         model.save(self.conf.model_path.format("hades"))
 
     def predict(self):
+        """
+        Predict the test set with trained model
+        :return:
+        """
         # Model Configuration
         model = self.sword.draw()
 
         # Load the test data
-        x = self.process_test_data()
+        # sentences, x = self.process_test_data()
+        # x_kanji, x_cxn = resolve(x)
+        with open(self.conf.validate_set.format("hades"), "rb") as fp:
+            test_x, test_y = pickle.load(fp)
+        fp.close()
+        test_x_kanji, test_x_cxn = resolve(test_x)
+        test_y = npy.argmax(test_y, axis=-1)
 
         # Load the model
+        self.hermes.info("Load the model.bin.hades...")
         model.load_weights(self.conf.model_path.format("hades"))
+        self.hermes.info("Load the model.bin.hades...Finished!")
 
         # Make the predictions
-        predictions = model.predict(x)
-        print(predictions)
+        predictions = model.predict([test_x_kanji, test_x_cxn])
+        predictions = npy.argmax(predictions, axis=-1)
+
+        self.hermes.info("Begin to predict...")
+
+        pred_y, gold_y, count = [], [], 0
+        for prediction in tqdm(predictions, desc="Predict"):
+            sentence = test_x_kanji[count]
+            len_of_sentence = get_length(sentence)
+            prediction = prediction[-len_of_sentence:]
+            labels = [self.conf.labels[label] for label in test_y[count][-len_of_sentence:]]
+            gold_y.append(labels)
+
+            label_index = [self.conf.labels[row] for row in prediction]
+            pred_y.append(label_index)
+
+            count += 1
+
+        report = classification_report(gold_y, pred_y)
+        print(report)
+
+        self.hermes.info("Begin to predict...Finished!")

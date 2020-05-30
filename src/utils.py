@@ -1,4 +1,5 @@
 from constants import *
+import numpy as npy
 import re
 
 
@@ -156,7 +157,7 @@ def vectorize_labels(labels, encoding):
     vector = []
 
     for label in labels:
-        vector.append(encoding.index(label) + 1)
+        vector.append(encoding.index(label))
 
     return vector
 
@@ -166,7 +167,7 @@ def merge(series1, series2):
     Merge two sequence
     :param series1: list[int]
     :param series2: list[int]
-    :return: series: list[list[int]]
+    :return: series: list[list]
     """
     series = []
 
@@ -175,3 +176,36 @@ def merge(series1, series2):
         series.append(item)
 
     return series
+
+
+def resolve(series):
+    """
+    Resolve the integrated series
+    :param series: series: list[list]
+    :return: series1: np.array, series2: np.array
+    """
+    series1, series2 = [], []
+    for item in series:
+        series1.append(item[0])
+        series2.append(item[1])
+
+    return npy.array(series1), npy.array(series2)
+
+
+def get_length(array):
+    """
+    Get the real length of sentence which is padded
+    :param array: np.array
+    :return: length: int
+    """
+    lst = [item for item in array]
+    sentence = []
+
+    for item in lst:
+        if item == 0:
+            continue
+        else:
+            sentence = lst[lst.index(item):]
+            break
+
+    return len(sentence)

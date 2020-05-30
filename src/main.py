@@ -13,18 +13,18 @@ if __name__ == "__main__":
     # args = parser.parse_args()
 
     # Load the logger
-    hermes = Hermes("Hades").on()
+    hermes = Hermes("Poseidon").on()
 
     # Load the configuration
     hermes.info("Load the Config...")
     conf = Config()
-    hermes.info("Loading the Config...Finished")
+    hermes.info("Loading the Config...Finished!")
 
     # Load the processor
     hermes.info("Loading the Processor...")
     processor = Processor(conf)
     hermes.info("Loading the Processor...Finished!")
 
-    hermes.info("Now, let's begin!")
     hades = Hades(conf, processor)
-    hades.process_test_data()
+    hades.train()
+    hades.predict()

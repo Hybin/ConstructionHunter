@@ -22,7 +22,7 @@ class Hermes(object):
         Create the formatter
         :return: formatter
         """
-        fmt = "%(asctime)-15s %(levelname)s %(filename)s %(message)s"
+        fmt = "[%(asctime)-15s] [%(levelname)s] %(filename)s %(message)s"
         date_fmt = "%a %d %b %Y %H:%M:%S"
         formatter = logging.Formatter(fmt, date_fmt)
 
@@ -56,6 +56,10 @@ class Hermes(object):
         return handler
 
     def on(self):
+        """
+        Turn on the logger
+        :return: logger
+        """
         logger = self.create_logger()
         file_handler, console_handler = self.create_file_handler(), self.create_console_handler()
 
