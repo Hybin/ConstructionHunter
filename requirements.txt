@@ -1,5 +1,6 @@
 tqdm
 stanfordcorenlp
-keras
+keras==2.2.4
 scikit-learn
 numpy
+keras-bert

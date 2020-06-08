@@ -7,3 +7,11 @@ categories = {
 }
 
 log_path = "../log/{}.log"
+
+# Consider the max length of the sequence
+# The bigger length you set, the more advance GPU the program require
+MAX_SEQUENCE_LENGTH = 180
+
+LEARNING_RATE = 5e-5
+
+MIN_LEARNING_RATE = 1e-5

@@ -15,14 +15,14 @@ class Hades(object):
         self.conf = conf
         self.processor = processor
         self.sword = Sword(conf)
-        self.hermes = Hermes("Hades").on()
+        self.hermes = Hermes(self.__class__.__name__).on()
 
     def process_train_data(self):
         """
         Process the training data
         :return: x:np.array, y: np.array
         """
-        sequences = self.processor.on()
+        sequences = self.processor.on(system="hades")
 
         word_feature, cxn_feature, labels, max_len = [], [], [], 0
         for sentence, index, sequence, label in sequences:
@@ -55,7 +55,7 @@ class Hades(object):
         Process the test data
         :return: x: np.array
         """
-        sequences = self.processor.up()
+        sequences = self.processor.up(system="hades")
 
         sentences, word_feature, cxn_feature, max_len = [], [], [], 0
         for sentence, index, sequence in sequences:
@@ -102,9 +102,9 @@ class Hades(object):
         model.fit([train_x_kanji, train_x_cxn], npy.array(train_y), batch_size=16, epochs=self.sword.epochs, validation_split=0.2)
         model.save(self.conf.model_path.format("hades"))
 
-    def predict(self):
+    def evaluate(self):
         """
-        Predict the test set with trained model
+        Evaluate the model
         :return:
         """
         # Model Configuration
@@ -147,3 +147,58 @@ class Hades(object):
         print(report)
 
         self.hermes.info("Begin to predict...Finished!")
+
+    def predict(self):
+        """
+        Predict the test set with trained model
+        :return:
+        """
+        # Model Configuration
+        model = self.sword.draw()
+
+        # Load the test data
+        sentences, x = self.process_test_data()
+        x_kanji, x_cxn = resolve(x)
+
+        # Load the model
+        self.hermes.info("Load the model.bin.hades...")
+        model.load_weights(self.conf.model_path.format("hades"))
+        self.hermes.info("Load the model.bin.hades...Finished!")
+
+        # Make the predictions
+        predictions = model.predict([x_kanji, x_cxn])
+        predictions = npy.argmax(predictions, axis=-1)
+
+        self.hermes.info("Begin to predict...")
+
+        results, count = [], 0
+        for prediction in tqdm(predictions, desc="Predict"):
+            sentence = sentences[count]
+            len_of_sentence = get_length(sentence)
+            prediction = prediction[-len_of_sentence:]
+
+            labels = [self.conf.labels[row] for row in prediction]
+
+            result = []
+            for i in range(0, len_of_sentence):
+                result.append((sentence[i], labels[i]))
+
+            results.append(result)
+
+            count += 1
+
+        self.hermes.info("Begin to predict...Finished!")
+
+        return results
+
+    def write(self, results):
+        self.hermes.info("Begin to write the annotation...")
+
+        with open(self.conf.output.format("hades"), "w") as fp:
+            for result in tqdm(results, desc="Write the data"):
+                for word, label in result:
+                    fp.write(word + "/" + label + "  ")
+
+                fp.write("\n")
+
+        fp.close()

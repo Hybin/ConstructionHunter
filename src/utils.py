@@ -1,4 +1,8 @@
 from constants import *
+from keras_bert import Tokenizer
+from keras.callbacks import Callback
+from tqdm import tqdm
+import keras.backend as K
 import numpy as npy
 import re
 
@@ -74,6 +78,67 @@ class Record(object):
 
         if index != -1:
             self.container[index] = (key, value, 1)
+
+
+class CustomTokenizer(Tokenizer):
+    def _tokenize(self, text):
+        characters = list()
+
+        for character in text:
+            if character in self._token_dict:
+                characters.append(character)
+            elif self._is_space(character):
+                characters.append("[unused1]")
+            else:
+                characters.append("[UNK]")
+
+        return characters
+
+
+class Evaluator(Callback):
+    def __init__(self, conf, data, excavate, train_model, pred_model, tokenizer, addition, hermes):
+        super().__init__()
+        self.accuracy = []
+        self.best = 0
+        self.passed = 0
+        self.conf = conf
+        self.data = data
+        self.excavate = excavate
+        self.train_model = train_model
+        self.pred_model = pred_model
+        self.tokenizer = tokenizer
+        self.addition = addition
+        self.hermes = hermes
+
+    def on_batch_begin(self, batch, logs=None):
+        if self.passed < self.params['steps']:
+            lr = (self.passed + 1.0) / self.params['steps'] * LEARNING_RATE
+            K.set_value(self.train_model.optimizer.lr, lr)
+        elif self.params['steps'] <= self.passed < self.params['steps'] * 2:
+            lr = (2 - (self.passed + 1.) / self.params['steps']) * (LEARNING_RATE - MIN_LEARNING_RATE)
+            lr += MIN_LEARNING_RATE
+            K.set_value(self.train_model.optimizer.lr, lr)
+        self.passed += 1
+
+    def evaluate(self):
+        correct = 0
+
+        for record in tqdm(self.data, "Predict"):
+            sample = self.excavate(record[0], record[1], self.tokenizer, self.pred_model, self.addition)
+            if sample == record[2]:
+                correct += 1
+
+        return correct / len(self.data)
+
+    def on_epoch_end(self, epoch, logs=None):
+        accuracy = self.evaluate()
+        self.accuracy.append(accuracy)
+
+        if accuracy > self.best:
+            self.best = accuracy
+            self.train_model.save_weights(self.conf.model_path.format("poseidon"))
+
+        self.hermes.info("accuracy: {}, best accuracy: {}".format(accuracy, self.best))
 
 
 # functions
@@ -209,3 +274,92 @@ def get_length(array):
             break
 
     return len(sentence)
+
+
+def get_cxn_sample(sentence, labels):
+    """
+    Get the sample of construction inside the sentence
+    :param sentence: list[str]
+    :param labels: list[str]
+    :return: sample: str
+    """
+    sample = str()
+    for i in range(len(sentence)):
+        if labels[i] != "O":
+            sample += sentence[i]
+
+    return sample
+
+
+def list_search(source, target):
+    """
+    Find out the position of the target in the source
+    :param source: list[str]
+    :param target: list[str]
+    :return: position: int
+    """
+    length = len(target)
+    for i in range(len(source)):
+        if source[i:i+length] == target:
+            return i
+
+    return -1
+
+
+def train_test_split(data):
+    """
+    Split the data
+    :param data: list[Any]
+    :return: train_data, test_data
+    """
+    seed = list(range(len(data)))
+    npy.random.shuffle(seed)
+
+    train, test = [], []
+    for i, j in enumerate(seed):
+        if i % 9 == 0:
+            test.append(data[j])
+        else:
+            train.append(data[j])
+
+    return train, test
+
+
+def softmax(x):
+    """
+    Compute the softmax
+    :param x: np.array
+    :return: float32
+    """
+    x = x - npy.max(x)
+    x = npy.exp(x)
+
+    return x / npy.sum(x)
+
+
+def additional(data):
+    """
+    Get the additional characters
+    :param data: list[Any]
+    :return: addition: Set
+    """
+    addition = set()
+
+    for record in data:
+        addition.update(re.findall(r"[^\u4e00-\u9fa5a-zA-Z0-9、“”，]", record[0]))
+
+    return addition
+
+
+def sequence_padding(X, padding=0):
+    """
+    Sequences Padding
+    :param X: npy.array
+    :param padding: int
+    :return: X
+    """
+    max_len = max([len(x) for x in X])
+
+    return npy.array([
+        npy.concatenate([x, [padding] * (max_len - len(x))]) if len(x) < max_len else x for x in X
+    ])

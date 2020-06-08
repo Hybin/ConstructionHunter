@@ -12,7 +12,7 @@ class Processor(object):
         # Use StanfordCoreNLP API
         # self.parser = StanfordCoreNLP(self.conf.stanford_core_nlp, lang="zh", quiet=False, memory="8g")
         # Use StanfordCoreNLPServer (Recommend! Faster!)
-        self.parser = StanfordCoreNLP(self.conf.core_nlp_host, port=self.conf.core_nlp_port, lang="zh")
+        # self.parser = StanfordCoreNLP(self.conf.core_nlp_host, port=self.conf.core_nlp_port, lang="zh")
 
     # ======================================
     # Process the train data of Hades
@@ -22,7 +22,7 @@ class Processor(object):
          :param file: string
          :return: training_data: list[tuple]
          """
-        with open(self.conf.train_data.format(file), "r") as fp:
+        with open(self.conf.train_data.format(file), "r", encoding="utf-8") as fp:
             lines = fp.readlines()
 
             training_data, sentence, labels = [], [], []
@@ -66,7 +66,8 @@ class Processor(object):
         fp.close()
 
     def get_constituency(self, sentence):
-        tree = self.parser.parse(sentence)
+        # tree = self.parser.parse(sentence)
+        tree = ""
         return tree
 
     @staticmethod
@@ -241,18 +242,6 @@ class Processor(object):
 
         return sequences
 
-    def on(self):
-        """
-        Process the train data
-        :return:
-        """
-        sequences = []
-        files = os.listdir(self.conf.train_data_dir)
-        for file in tqdm(files, desc="Process the training data"):
-            sequences += self.extract(file)
-
-        return sequences
-
     # ======================================
     # Process the test data of Hades
     # ======================================
@@ -264,7 +253,7 @@ class Processor(object):
         """
         test_data = []
 
-        with open(self.conf.test_data.format(file), "r") as fp:
+        with open(self.conf.test_data.format(file), "r", encoding="utf-8") as fp:
             lines = fp.readlines()
 
             for line in lines:
@@ -312,15 +301,76 @@ class Processor(object):
 
         return sequences
 
-    def up(self):
+    # ======================================
+    # Process the data of Poseidon
+    # ======================================
+    def fishing(self, file):
         """
-        Process the test data
-        :return:
+        Process the training data for poseidon
+        :param file: string
+        :return: sequence: list
+        """
+        # Load the training data
+        data = self.load_training_data(file)
+
+        # Get the construction
+        construction = "".join(file.split(".")[0].split("_")[1].split("+"))
+
+        sequences = list()
+        for sentence, labels in data:
+            sample = get_cxn_sample(sentence, labels)
+            sentence = "".join(sentence)
+            sequences.append((construction, sentence, sample))
+        return sequences
+
+    def surfing(self, file):
+        """
+        Process the test data for poseidon
+        :param file: string
+        :return: sequence: list
+        """
+        # Load the test data
+        data = self.load_test_data(file)
+
+        # Get the construction
+        construction = "".join(file.split(".")[0].split("_")[1].split("+"))
+
+        sequences = list()
+        for record in data:
+            sentence = "".join(record)
+            sequences.append((construction, sentence))
+
+        return sequences
+
+    # ======================================
+    # Deal
+    # ======================================
+    def on(self, system):
+        """
+        Process the train data
+        :return: sequences: list[tuple]
         """
         sequences = []
+        files = os.listdir(self.conf.train_data_dir)
+        for file in tqdm(files, desc="Process the training data"):
+            if system == "hades":
+                sequences += self.extract(file)
+            elif system == "poseidon":
+                sequences += self.fishing(file)
 
+        return sequences
+
+    def up(self, system):
+        """
+        Process the test data
+        :return: sequences: list[tuple]
+        """
+        sequences = []
         files = os.listdir(self.conf.test_data_dir)
         for file in tqdm(files, desc="Process the test data"):
-            sequences += self.process(file)
+            if system == "hades":
+                sequences += self.process(file)
+            elif system == "poseidon":
+                sequences += self.surfing(file)
 
         return sequences

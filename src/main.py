@@ -1,15 +1,14 @@
 from config import Config
 from processor import Processor
 from hades import Hades
+from poseidon import Poseidon
 from hermes import Hermes
-from utils import *
 import argparse
-import os
 
 if __name__ == "__main__":
-    # Get the path and form of a construction from command-line
+    # Command-Line Options
     # parser = argparse.ArgumentParser(description="Automatic Recognizer for Chinese sentential construction")
-    # parser.add_argument("-f", "--file", help="The path (specifically file name) of the raw material")
+    # parser.add_argument("-s", "--system", help="The name of system inside the Automatic Recognizer like zeus, poseidon and hades")
     # args = parser.parse_args()
 
     # Load the logger
@@ -25,6 +24,5 @@ if __name__ == "__main__":
     processor = Processor(conf)
     hermes.info("Loading the Processor...Finished!")
 
-    hades = Hades(conf, processor)
-    hades.train()
-    hades.predict()
+    poseidon = Poseidon(conf, processor)
+    poseidon.predict()
