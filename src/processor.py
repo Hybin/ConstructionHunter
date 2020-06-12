@@ -12,13 +12,11 @@ class Processor(object):
         # Use StanfordCoreNLP API
         # self.parser = StanfordCoreNLP(self.conf.stanford_core_nlp, lang="zh", quiet=False, memory="8g")
         # Use StanfordCoreNLPServer (Recommend! Faster!)
-        # self.parser = StanfordCoreNLP(self.conf.core_nlp_host, port=self.conf.core_nlp_port, lang="zh")
+        self.parser = StanfordCoreNLP(self.conf.core_nlp_host, port=self.conf.core_nlp_port, lang="zh")
 
-    # ======================================
-    # Process the train data of Hades
-    # ======================================
     def load_training_data(self, file):
         """ Load the training data
+
          :param file: string
          :return: training_data: list[tuple]
          """
@@ -43,6 +41,7 @@ class Processor(object):
     def _create_dictionary(self):
         """
         Create word-index dictionary of training data
+
         :return:
         """
         frequency = {}
@@ -66,32 +65,25 @@ class Processor(object):
         fp.close()
 
     def get_constituency(self, sentence):
-        # tree = self.parser.parse(sentence)
-        tree = ""
+        """
+        Get the constituents structural tree
+
+        :param sentence: string
+        :return: tree: string
+        """
+        tree = self.parser.parse(sentence)
         return tree
 
     @staticmethod
-    def get_components(file):
+    def get_constants(construction):
         """
-         Get the constants and variables from the construction form
-         :param file: string
-         :return: constants: list[string]
-         """
-        construction = file.split(".")[0].split("_")[1].split("+")
-        cxn_without_comma = [element for element in construction if element != "，"]
+        Get the constants from the construction form
 
-        components, constants, previous = [], [], ""
-        for component in cxn_without_comma:
-            if len(re.search(r'[a-zA-Z0-9]*', component).group()) == 0:
-                if previous == "constant":
-                    components[-1][1] = components[-1][1] + component
-                    continue
-                previous = "constant"
-            else:
-                previous = "variable"
-            components.append([previous, component])
+        :param construction: list[string]
+        :return: constants: list[string]
+        """
+        previous, constants = str(), list()
 
-        previous = ""
         for component in construction:
             if len(re.search(r'[a-zA-Z0-9，]*', component).group()) == 0:
                 if previous == "constant":
@@ -102,9 +94,42 @@ class Processor(object):
             else:
                 previous = "variable"
 
+        return constants
+
+    def get_components(self, file, variant=None):
+        """
+         Get the constants and variables from the construction form
+
+         :param file: string
+         :param variant: list[string]
+         :return: components:list[list[string]], constants: list[string]
+         """
+        construction = file.split(".")[0].split("_")[1].split("+") if variant is None else variant
+
+        components, constants, previous = list(), self.get_constants(construction), ""
+        for component in construction:
+            if len(re.search(r'[a-zA-Z0-9]*', component).group()) != 0:
+                previous = "variable"
+                components.append([previous, component])
+            elif component == "，":
+                previous = "punctuation"
+            else:
+                if previous == "constant":
+                    components[-1][1] = components[-1][1] + component
+                    continue
+                previous = "constant"
+                components.append([previous, component])
+
         return components, constants
 
     def cut_sentence(self, sentence, constants):
+        """
+        Cut the sentence by constants of the construction
+
+        :param sentence: string
+        :param constants: list[string]
+        :return: segments: Record
+        """
         segments = Record()
 
         prev, next = 0, 0
@@ -138,6 +163,7 @@ class Processor(object):
     def _extract_comma(file, sequence, sentence):
         """
         Extract the feature: comma
+
         :param file: string
         :param sequence: list[int]
         :param sentence: string
@@ -169,6 +195,7 @@ class Processor(object):
     def _extract_components(self, components, sentence, segments, sequence):
         """
         Extract the feature: constants and variables
+
         :param components: list[tuple]
         :param sentence: string
         :param segments: Record
@@ -212,6 +239,7 @@ class Processor(object):
     def extract(self, file):
         """
          Extract the feature: words, constants and variables from training data
+
          :param file: string
          :return: sequences: list[tuple]
          """
@@ -248,6 +276,7 @@ class Processor(object):
     def load_test_data(self, file):
         """
         Load the test data
+
         :param file: string
         :return: test_data: list[list[string]]
         """
@@ -272,6 +301,7 @@ class Processor(object):
     def process(self, file):
         """
         Extract the feature: words, constants and variables from test data
+
         :param file: string
         :return: sequences: list[tuple]
         """
@@ -307,6 +337,7 @@ class Processor(object):
     def fishing(self, file):
         """
         Process the training data for poseidon
+
         :param file: string
         :return: sequence: list
         """
@@ -326,6 +357,7 @@ class Processor(object):
     def surfing(self, file):
         """
         Process the test data for poseidon
+
         :param file: string
         :return: sequence: list
         """
@@ -348,6 +380,7 @@ class Processor(object):
     def on(self, system):
         """
         Process the train data
+
         :return: sequences: list[tuple]
         """
         sequences = []
@@ -363,6 +396,7 @@ class Processor(object):
     def up(self, system):
         """
         Process the test data
+
         :return: sequences: list[tuple]
         """
         sequences = []

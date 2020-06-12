@@ -2,6 +2,7 @@ from config import Config
 from processor import Processor
 from hades import Hades
 from poseidon import Poseidon
+from zeus import Zeus
 from hermes import Hermes
 import argparse
 
@@ -12,17 +13,12 @@ if __name__ == "__main__":
     # args = parser.parse_args()
 
     # Load the logger
-    hermes = Hermes("Poseidon").on()
+
 
     # Load the configuration
-    hermes.info("Load the Config...")
+
     conf = Config()
-    hermes.info("Loading the Config...Finished!")
 
-    # Load the processor
-    hermes.info("Loading the Processor...")
-    processor = Processor(conf)
-    hermes.info("Loading the Processor...Finished!")
 
-    poseidon = Poseidon(conf, processor)
-    poseidon.predict()
+    zeus = Zeus(conf)
+    zeus.test()

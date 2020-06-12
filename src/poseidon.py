@@ -1,15 +1,16 @@
 from hermes import Hermes
 from trident import Trident
 from dolphin import Dolphin
+from processor import Processor
 from tqdm import tqdm
 from utils import *
 import re
 
 
 class Poseidon(object):
-    def __init__(self, conf, processor):
+    def __init__(self, conf):
         self.conf = conf
-        self.processor = processor
+        self.processor = Processor(conf)
         self.trident = Trident(conf)
         self.hermes = Hermes(self.__class__.__name__).on()
 

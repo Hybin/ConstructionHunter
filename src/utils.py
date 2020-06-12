@@ -363,3 +363,56 @@ def sequence_padding(X, padding=0):
     return npy.array([
         npy.concatenate([x, [padding] * (max_len - len(x))]) if len(x) < max_len else x for x in X
     ])
+
+
+def segments_filling(segments, sentence):
+    """
+    Filling the blanks of segments
+    :param segments: list[tuple]
+    :param sentence: string
+    :return:
+    """
+    ranges, size = list(), len(segments)
+
+    for i in range(size):
+        left, right = segments[i]
+
+        # Blanks at first
+        if i == 0 and left != 0:
+            ranges.append((0, left))
+
+        # Blanks at middle
+        if i > 0:
+            tail, head = segments[i - 1][1], segments[i][0]
+
+            if tail != head:
+                ranges.append((tail, head))
+
+        ranges.append((left, right))
+
+        # Blanks at last
+        if i == size - 1 and right != len(sentence):
+            ranges.append((right, len(sentence)))
+
+    return ranges
+
+
+def automaton(construction):
+    nodes, machine = dict(), dict()
+
+    for i in range(len(construction)):
+        if i not in nodes.keys():
+            nodes[i] = dict()
+
+        nodes[i]["value"] = construction[i][1]
+        nodes[i]["prev"] = "start" if i == 0 else construction[i - 1][1]
+        nodes[i]["next"] = "end" if i == len(construction) - 1 else construction[i + 1][1]
+
+    for node, value in nodes.items():
+        if value["value"] not in machine.keys():
+            machine[value["value"]] = dict()
+
+        machine[value["value"]]["next"] = value["next"]
+        machine[value["value"]]["prev"] = value["prev"]
+
+    return machine
