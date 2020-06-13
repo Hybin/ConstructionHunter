@@ -8,12 +8,13 @@ import os
 
 
 class Zeus(object):
-    def __init__(self, conf):
+    def __init__(self, conf, poseidon, hermes):
         self.conf = conf
+        self.poseidon = poseidon
         self.processor = Processor(conf)
-        self.hermes = Hermes("Zeus").on()
+        self.hermes = hermes
         self.features = Features()
-        self.thunder = Thunder(self.features, self.processor)
+        self.thunder = Thunder(self.conf, self.features, self.processor, self.poseidon, self.hermes)
         self.scepter = Scepter(conf, self.hermes, self.processor, self.features, self.thunder)
 
     def process_test_data(self):
@@ -31,6 +32,15 @@ class Zeus(object):
             data.append((file, samples))
 
         return data
+
+    def test(self):
+        files = os.listdir(self.conf.test_data_dir)
+
+        model, tokenizer = self.thunder.load_bert()
+        for file in files[:1]:
+            sentences = ["".join(sentence) for sentence in self.processor.load_test_data(file)]
+            for sentence in sentences:
+                self.scepter.extract_character(sentence, model, tokenizer)
 
     def write_to_xml(self):
         """

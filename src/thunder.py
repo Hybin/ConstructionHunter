@@ -1,7 +1,13 @@
+from keras_bert import load_trained_model_from_checkpoint, Tokenizer
+
+
 class Thunder(object):
-    def __init__(self, features, processor):
+    def __init__(self, conf, features, processor, poseidon, hermes):
+        self.conf = conf
         self.features = features
         self.processor = processor
+        self.poseidon = poseidon
+        self.hermes = hermes
 
     def cxn_filter(self, sentence, construction):
         """
@@ -42,3 +48,17 @@ class Thunder(object):
         candidates.sort()
 
         return candidates[-1][1]
+
+    def load_bert(self):
+        """
+        Load the bert model
+
+        :return: model, tokenizer
+        """
+        self.hermes.info("Load the bert...")
+        model = load_trained_model_from_checkpoint(self.conf.bert["config"], self.conf.bert["checkpoint"])
+
+        self.hermes.info("Build the tokenizer...")
+        tokenizer = self.poseidon.build_tokenizer()
+
+        return model, tokenizer

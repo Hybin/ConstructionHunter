@@ -3,7 +3,6 @@ from keras.utils import to_categorical
 from sword import Sword
 from sklearn.model_selection import train_test_split
 from processor import Processor
-from hermes import Hermes
 from tqdm import tqdm
 from seqeval.metrics import classification_report
 from utils import *
@@ -12,11 +11,11 @@ import pickle
 
 
 class Hades(object):
-    def __init__(self, conf):
+    def __init__(self, conf, hermes):
         self.conf = conf
         self.processor = Processor(conf)
         self.sword = Sword(conf)
-        self.hermes = Hermes(self.__class__.__name__).on()
+        self.hermes = hermes
 
     def process_train_data(self):
         """

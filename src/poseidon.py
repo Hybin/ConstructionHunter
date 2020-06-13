@@ -1,4 +1,3 @@
-from hermes import Hermes
 from trident import Trident
 from dolphin import Dolphin
 from processor import Processor
@@ -8,11 +7,11 @@ import re
 
 
 class Poseidon(object):
-    def __init__(self, conf):
+    def __init__(self, conf, hermes):
         self.conf = conf
         self.processor = Processor(conf)
         self.trident = Trident(conf)
-        self.hermes = Hermes(self.__class__.__name__).on()
+        self.hermes = hermes
 
     def build_tokenizer(self):
         """

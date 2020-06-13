@@ -1,5 +1,6 @@
 from tqdm import tqdm
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 from utils import *
 import numpy as npy
 
@@ -15,6 +16,7 @@ class Scepter(object):
     def get_cxn_form(self, sentence, construction):
         """
         Get the best form of the construction
+
         :param sentence: string
         :param construction: string
         :return: construction: list[string]
@@ -26,6 +28,7 @@ class Scepter(object):
     def const_match_without_exp(sentence, components, constants):
         """
         Constants Matching without block expansion
+
         :param sentence: string
         :param components: list[list]
         :param constants: list[string]
@@ -46,6 +49,7 @@ class Scepter(object):
     def const_match_with_exp(sentence, components, constants):
         """
         Constants Matching with block expansion
+
         :param sentence: string
         :param components: list[list]
         :param constants: list[string]
@@ -103,6 +107,7 @@ class Scepter(object):
     def variables_spot(self, construction, sentence, expand=False):
         """
         Spot the text range of variables
+
         :param construction: list[string]
         :param sentence: string
         :param expand: boolean
@@ -142,6 +147,7 @@ class Scepter(object):
     def var_match_with_cat(self, sentence, segment, cat):
         """
         Match the variables with syntactic category
+
         :param sentence: string
         :param segment: tuple[int]
         :param cat: string
@@ -159,6 +165,7 @@ class Scepter(object):
     def var_match_without_cat(sentence, segment):
         """
         Match the variables without syntactic category
+
         :param sentence: string
         :param segment: tuple[int]
         :return: start: int, end: int
@@ -173,6 +180,7 @@ class Scepter(object):
     def _extract_constants(self, sentence, construction, expand=False):
         """
         Extract the feature of constants
+
         :param sentence: string
         :param construction: list[string]
         :param expand: boolean
@@ -212,6 +220,18 @@ class Scepter(object):
             replace(sequence, start, end, 1)
 
         return sequence
+
+    @staticmethod
+    def extract_character(sentence, model, tokenizer):
+        # Encode the sentences
+        tokens = tokenizer.tokenize(sentence)
+        indices, segments = tokenizer.encode(first=sentence, max_len=512)
+
+        # Predict the sentence
+        embeddings = model.predict([npy.array([indices]), npy.array([segments])])[0]
+
+        for index, token in enumerate(tokens):
+            print(token, PCA(n_components="mle").fit_transform(embeddings[index]))
 
     def extract(self, file):
         """
