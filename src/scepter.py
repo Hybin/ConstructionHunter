@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from sklearn.cluster import KMeans
 from utils import *
 import numpy as npy
 
@@ -245,9 +246,28 @@ class Scepter(object):
             sequence = npy.array(sequence).T
             sequences.append(sequence)
 
-        return npy.array(sequences)
+        return sentences, npy.array(sequences)
 
-    # TODO: k-means clusteringz
+    def cluster(self, file):
+        """
+        Clustering with extracted features
 
+        :param file: string
+        :return: samples: list[list[tuple]]
+        """
+        sentences, sequences = self.extract(file)
 
+        samples = list()
+        for sentence, sequence in zip(sentences, sequences):
+            # Clustering the samples
+            k_means = KMeans(n_clusters=3, random_state=0).fit(sequence)
+            # Predict the labels
+            labels = k_means.predict(sequence)
+            # Store the sample
+            sample = [(word, label) for word, label in zip(sentence, labels)]
+            samples.append(sample)
 
+        return samples
+
+    def annotate(self, file, samples):
+        pass

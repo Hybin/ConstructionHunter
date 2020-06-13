@@ -12,9 +12,6 @@ if __name__ == "__main__":
     # parser.add_argument("-s", "--system", help="The name of system inside the Automatic Recognizer like zeus, poseidon and hades")
     # args = parser.parse_args()
 
-    # Load the logger
-
-
     # Load the configuration
 
     conf = Config()
