@@ -3,307 +3,262 @@
         "X+不+叫+X+，+叫+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "X+的+也+有+，+Y+的+也+有": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "X+不+说+，+还+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "X+，+实则+vp": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "X+也罢+，+Y+也罢": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "X+也好+，+Y+也好": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "a1+的+a1+，+a2+的+a2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "n1+不+是+n1+，+n2+不+是+n2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
-			"variants": []
+			"variants": [
+                "看+n1+不+是+n1+，+看+n2+不+是+n2",
+                "见+n1+不+是+n1+，+见+n2+不+是+n2",
+                "似+n1+不+是+n1+，+似+n2+不+是+n2",
+                "似+n1+不+是+n1+，+似+n2+又+不+是+n2",
+                "像+n1xz+不+是+n1+，+似+n2+并+非+n2"
+            ]
         },
         "n1+也+有+，+n2+也+有": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "v+也+得+v+，+不+v+也+得+v": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
-			"variants": ["让+v+得+v+，+不+让+v+也+得+v"]
+			"variants": ["让+v+得+v+，+不+让+v+也+得+v", "v+也+得+v+，+不+v+也+要+v"]
         },
         "v1+什么+，+v2+什么": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "vp1+也+不+是+，+vp2+也+不+是": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+X+都+Y+，+更+别+说+Z": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+X+都+vp1+还+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+X+都+vp": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+np+也+vp1+更+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+np+也+vp1+还+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+np+也+vp1+何况+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["连+np+也+vp1+更+何况+vp2"]
         },
         "连+np+还+vp": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+np+也+vp": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "连+np1+都+vp+何况+np2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["连+np1+都+vp+更+何况+np2"]
         },
         "连+np1+也+vp+何况+np2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["连+np1+也+vp+更+何况+np2"]
         },
         "是+np1+，+不+是+np2": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["是+np1+，+不+是+np2+，+也+不+是+np3"]
         },
         "你+v1+你+的+n1+，+我+v2+我+的+n2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
-			"variants": []
+			"variants": ["你+v1+你+的+n1+，+我们+v2+我们+的+n2"]
         },
         "该+vp1+的+vp1+，+该+vp2+的+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "要+vp1+也+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "再+vp1+就+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "再+vp1+也+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["再+vp1+也+终归+vp2", "再+vp1+终归+vp2"]
         },
         "该+vp1+的+不+vp1+，+该+vp2+的+不+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
-			"variants": []
+			"variants": ["该+vp1+的+不+vp1+，+该+vp2+的+也+不+vp2", "该+vp1+的+不+vp1+，+不该+vp2+的+vp2"]
         },
         "别+说+X+，+连+Y+都+Z": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "别+说+X+，+就是+Y+也+Z": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["别+说+X+，+Y+也+Z", "别+说+X+，+就是+Y+都+Z"]
         },
         "就+是+np+也+vp": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "还+是+np1+，+还+是+np2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "没+有+np1+就+等于+没+有+np2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["没+有+np1+等于+没+有+np2"]
         },
         "一+个+vp+，+X": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "左+一+个+X1+，+右+一+个+X2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["左+一+个+X1+，+右+一+声+X2"]
         },
-        "不+要+说+np1++，++就+是+np2+也+vp": {
+        "不+要+说+np1+，+就+是+np2+也+vp": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
-			"variants": []
+			"variants": ["不+要+说+np1+，+就+是+np2+又+vp"]
         },
         "不+要+说+vp1+，+就+是+vp2+也+vp3": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "不管+X+，+n+也+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "不管+X+，+都+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "宁可+X+，+也+不+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "宁可+X+，+也+要+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "莫说+X+，+就是+Y+也+Z": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["莫说+X+，+就是+Y+居然+Z", "莫说+X+，+就是+Y+亦+Z", "莫说+X+，+就是+Y+还+Z", "莫说+X+，+就是+Y+，+Z"]
         },
         "不但+X+，+甚至+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "时而+X+，+时而+Y": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "今天+X+，+明天+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "不是+X+便是+Y": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["不是+X+就是+Y"]
         },
         "或许+X+或许+Y": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "或则+X+或则+Y": {
             "block_expansion": true,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": []
         },
         "怎么+vp1+也+不+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["iu"]
         },
         "第一+是+X+，+第二+是+X+，+第三+还+是+X": {
             "block_expansion": false,
             "structure_similarity": false,
-            "model_included": false,
 			"variants": ["第一+X+，+第二+X+，+第三+还+是+X"]
         }
     }

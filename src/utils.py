@@ -160,6 +160,7 @@ def replace(array, start, end, value):
 def tree_to_dict(tree):
     """
     Convert the tree to dict
+
     :param tree: string
     :return: nodes: list[dict]
     """
@@ -195,6 +196,7 @@ def tree_to_dict(tree):
 def search(array, key):
     """
     Search for dict-item according to the given key
+
     :param array: list[dict]
     :param key: string
     :return: value: string
@@ -215,6 +217,7 @@ def search(array, key):
 def vectorize_labels(labels, encoding):
     """
     Convert the labels to vector
+
     :param labels: list
     :param encoding: list
     :return: vector[list]
@@ -230,6 +233,7 @@ def vectorize_labels(labels, encoding):
 def merge(series1, series2):
     """
     Merge two sequence
+
     :param series1: list[int]
     :param series2: list[int]
     :return: series: list[list]
@@ -246,6 +250,7 @@ def merge(series1, series2):
 def resolve(series):
     """
     Resolve the integrated series
+
     :param series: series: list[list]
     :return: series1: np.array, series2: np.array
     """
@@ -260,6 +265,7 @@ def resolve(series):
 def get_length(array):
     """
     Get the real length of sentence which is padded
+
     :param array: np.array
     :return: length: int
     """
@@ -279,6 +285,7 @@ def get_length(array):
 def get_cxn_sample(sentence, labels):
     """
     Get the sample of construction inside the sentence
+
     :param sentence: list[str]
     :param labels: list[str]
     :return: sample: str
@@ -294,6 +301,7 @@ def get_cxn_sample(sentence, labels):
 def list_search(source, target):
     """
     Find out the position of the target in the source
+
     :param source: list[str]
     :param target: list[str]
     :return: position: int
@@ -309,6 +317,7 @@ def list_search(source, target):
 def train_test_split(data):
     """
     Split the data
+
     :param data: list[Any]
     :return: train_data, test_data
     """
@@ -328,6 +337,7 @@ def train_test_split(data):
 def softmax(x):
     """
     Compute the softmax
+
     :param x: np.array
     :return: float32
     """
@@ -340,6 +350,7 @@ def softmax(x):
 def additional(data):
     """
     Get the additional characters
+
     :param data: list[Any]
     :return: addition: Set
     """
@@ -354,6 +365,7 @@ def additional(data):
 def sequence_padding(X, padding=0):
     """
     Sequences Padding
+
     :param X: npy.array
     :param padding: int
     :return: X
@@ -368,6 +380,7 @@ def sequence_padding(X, padding=0):
 def segments_filling(segments, sentence):
     """
     Filling the blanks of segments
+
     :param segments: list[tuple]
     :param sentence: string
     :return:
@@ -398,6 +411,11 @@ def segments_filling(segments, sentence):
 
 
 def automaton(construction):
+    """ Convert the construction to automaton
+
+    :param construction: str
+    :return: machine: dict
+    """
     nodes, machine = dict(), dict()
 
     for i in range(len(construction)):
@@ -416,3 +434,18 @@ def automaton(construction):
         machine[value["value"]]["prev"] = value["prev"]
 
     return machine
+
+
+def xor(a, b):
+    """ XOR of two list
+
+    :param a: list[int]
+    :param b: list[int]
+    :return: sequence: list[int]
+    """
+    sequence = [0] * len(a)
+
+    for i in range(len(a)):
+        sequence[i] = a[i] ^ b[i]
+
+    return sequence

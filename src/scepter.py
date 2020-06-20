@@ -17,9 +17,9 @@ class Scepter(object):
         """
         Get the best form of the construction
 
-        :param sentence: string
-        :param construction: string
-        :return: construction: list[string]
+        :param sentence: str
+        :param construction: str
+        :return: construction: list[str]
         """
 
         return self.thunder.cxn_optimize(sentence, construction)
@@ -29,9 +29,9 @@ class Scepter(object):
         """
         Constants Matching without block expansion
 
-        :param sentence: string
+        :param sentence: str
         :param components: list[list]
-        :param constants: list[string]
+        :param constants: list[str]
         :return: checkpoints: Record
         """
         checkpoints = Record()
@@ -50,9 +50,9 @@ class Scepter(object):
         """
         Constants Matching with block expansion
 
-        :param sentence: string
+        :param sentence: str
         :param components: list[list]
-        :param constants: list[string]
+        :param constants: list[str]
         :return: checkpoints: Record
         """
         checkpoints, candidates, elements, machine = Record(), list(), list(), automaton(components)
@@ -108,10 +108,10 @@ class Scepter(object):
         """
         Spot the text range of variables
 
-        :param construction: list[string]
-        :param sentence: string
-        :param expand: boolean
-        :return:
+        :param construction: list[str]
+        :param sentence: str
+        :param expand: bool
+        :return: var_spots: list[tuple]
         """
         # Get the components of the construction
         components, constants = self.processor.get_components("", variant=construction)
@@ -148,9 +148,9 @@ class Scepter(object):
         """
         Match the variables with syntactic category
 
-        :param sentence: string
+        :param sentence: str
         :param segment: tuple[int]
-        :param cat: string
+        :param cat: str
         :return: start: int, end: int
         """
         left, right = segment
@@ -166,7 +166,7 @@ class Scepter(object):
         """
         Match the variables without syntactic category
 
-        :param sentence: string
+        :param sentence: str
         :param segment: tuple[int]
         :return: start: int, end: int
         """
@@ -181,9 +181,9 @@ class Scepter(object):
         """
         Extract the feature of constants
 
-        :param sentence: string
-        :param construction: list[string]
-        :param expand: boolean
+        :param sentence: str
+        :param construction: list[str]
+        :param expand: bool
         :return: sequence: list[int]
         """
         # Get the components of the construction
@@ -201,17 +201,16 @@ class Scepter(object):
         """
         Extract the feature of variables
 
-        :param sentence: string
-        :param construction: list[string]
-        :param expand: boolean
+        :param sentence: str
+        :param construction: list[str]
+        :param expand: bool
         :return: sequence: list[int]
         """
+        # Get the text ranges of variables
         var_spots = self.variables_spot(construction, sentence, expand)
 
         sequence = [0] * len(sentence)
-        for spot in var_spots:
-            cat, segment = spot
-
+        for cat, segment in var_spots:
             if len(re.findall(r"[A-Z]", cat)) > 0:
                 start, end = self.var_match_with_cat(sentence, segment, cat)
             else:
@@ -221,23 +220,92 @@ class Scepter(object):
 
         return sequence
 
+    def _extract_similarity(self, sentence, construction, expand, similar=False):
+        """Extract the structural similarity of variables inside the construction
+
+        :param sentence: str
+        :param construction: str
+        :param expand: bool
+        :param similar: bool
+        :return: sequence: list[int]
+        """
+        sequence = [0] * len(sentence)
+
+        if similar:
+            # Get the text ranges of variables
+            var_spots = self.variables_spot(construction, sentence, expand)
+
+            # Found out the minimal range
+            min_len = len(sentence)
+            for cat, (left, right) in var_spots:
+                if right - left < min_len:
+                    min_len = right - left
+
+            # Extract the similarity
+            for cat, (left, right) in var_spots:
+                replace(sequence, left, left + min_len, 1)
+
+        return sequence
+
+    def _extract_modal(self, sentence, construction, expand):
+        """
+        Check if the modal particles belongs to the variable
+        :param sentence: str
+        :param construction: str
+        :param expand:  bool
+        :return: sequence: list[int]
+        """
+        sequence = [0] * len(sentence)
+
+        # Get the text ranges of variables
+        var_spots = self.variables_spot(construction, sentence, expand)
+
+        for cat, (left, right) in var_spots:
+            try:
+                text, modal = sentence[left:right][0:-1], sentence[left:right][-1]
+
+                nodes = tree_to_dict(self.processor.get_constituency(modal))
+
+                for node in nodes:
+                    for key, value in node.items():
+                        if (key == "u" or key == "y") and value == modal:
+                            words = tree_to_dict(self.processor.get_constituency(text))
+
+                            target = tuple()
+                            for word in words:
+                                for c, w in word.items():
+                                    if text.rfind(w) == len(text) - len(w):
+                                        target = (c, w)
+
+                            if modal not in self.conf.modal_particles or target[0] in ["n", "np"]:
+                                continue
+                            else:
+                                replace(sequence, right - 1, right, 1)
+            except IndexError:
+                print(var_spots, left, right, sentence)
+                exit(0)
+
+        return sequence
+
     @staticmethod
-    def extract_character(sentence, model, tokenizer):
+    def _extract_character(sentence, model, tokenizer):
         # Encode the sentences
-        tokens = tokenizer.tokenize(sentence)
         indices, segments = tokenizer.encode(first=sentence, max_len=512)
 
         # Predict the sentence
         embeddings = model.predict([npy.array([indices]), npy.array([segments])])[0]
 
-        for index, token in enumerate(tokens):
-            print(token, PCA(n_components="mle").fit_transform(embeddings[index]))
+        # Dimension Reduce
+        embeddings = PCA(n_components=1).fit_transform(embeddings)
+        embeddings = [embedding[0] for embedding in embeddings[1:len(sentence) + 1]]
+
+        return embeddings
 
     def extract(self, file):
         """
         Extract the features of the construction
 
-        :param file: string
+        :param file: str
         :return: sequences: npy.array
         """
         self.hermes.info("Load the data...")
@@ -246,8 +314,10 @@ class Scepter(object):
 
         construction = file.split(".")[0].split("_")[1]
         expand = self.features.constructions[construction]["block_expansion"]
+        similarity = self.features.constructions[construction]["structure_similarity"]
         self.hermes.info("Begin to process the construction: " + construction)
         self.hermes.info("Block expansion of construction: " + str(expand))
+        self.hermes.info("Structure similarity of construction: " + str(similarity))
 
         sequences = list()
         self.hermes.info("Extract the features...")
@@ -259,9 +329,14 @@ class Scepter(object):
 
             feature_constants = self._extract_constants(sentence, construction, expand)
             feature_variables = self._extract_variables(sentence, construction, expand)
+            feature_const_sim = self._extract_similarity(sentence, construction, expand, similarity)
+            feature_modal_par = self._extract_modal(sentence, construction, expand)
+
+            feature_variables = xor(feature_variables, feature_modal_par)
 
             sequence.append(feature_constants)
             sequence.append(feature_variables)
+            sequence.append(feature_const_sim)
 
             sequence = npy.array(sequence).T
             sequences.append(sequence)
@@ -272,7 +347,7 @@ class Scepter(object):
         """
         Clustering with extracted features
 
-        :param file: string
+        :param file: str
         :return: samples: list[list[tuple]]
         """
         sentences, sequences = self.extract(file)

@@ -26,6 +26,9 @@ class Zeus(object):
         self.hermes.info("Load the test files...")
         files = os.listdir(self.conf.test_data_dir)
 
+        # self.hermes.info("Load the Bert...")
+        # model, tokenizer = self.thunder.load_bert()
+
         data = list()
         for file in files:
             samples = self.scepter.cluster(file)
@@ -33,14 +36,13 @@ class Zeus(object):
 
         return data
 
-    def test(self):
-        files = os.listdir(self.conf.test_data_dir)
+    def predict(self):
+        data = self.process_test_data()
 
-        model, tokenizer = self.thunder.load_bert()
-        for file in files[:1]:
-            sentences = ["".join(sentence) for sentence in self.processor.load_test_data(file)]
-            for sentence in sentences:
-                self.scepter.extract_character(sentence, model, tokenizer)
+        for file, samples in data:
+            for sample in samples:
+                for word, label in sample:
+                    print(word, label)
 
     def write_to_xml(self):
         """

@@ -4,3 +4,6 @@ keras==2.2.4
 scikit-learn
 numpy
 keras-bert
+seqeval
+tensorflow==1.13.1
+tensorflow-gpu==1.13.1

@@ -23,4 +23,4 @@ if __name__ == "__main__":
     poseidon = Poseidon(conf, hermes)
 
     zeus = Zeus(conf, poseidon, hermes)
-    zeus.test()
+    zeus.predict()
