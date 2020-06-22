@@ -23,15 +23,43 @@
 
 
 ### Preparation
-**训练数据命名规范**
+**训练数据命名及格式规范**
 
-对于每一个训练语料文件，将其命名为`training_[construction]_[id].txt`，比如`training_a+上+加+a_0219.txt`；
+* 对于每一个训练语料文件，将其命名为`training_[construction]_[id].txt`，比如`training_a+上+加+a_0219.txt`；
 
-**测试(待标注)数据命名规范**
+* 就训练数据文件内部格式而言，需要将句子处理为`字-标签`的形式，比如：
 
-对于每一个测试语料文件，将其命名为`test_[construction]_[id].txt`，比如`test_a1+的+a1+，+a2+的+a2_1860.txt`；
+  ```
+  ...
+  后	O
+  悔	O
+  更	O
+  是	O
+  假	B-V
+  上	B-C
+  加	I-C
+  假	B-V
+  ...
+  ```
+
+
+
+**测试(待标注)数据命名及格式规范**
+
+* 对于每一个测试语料文件，将其命名为`test_[construction]_[id].txt`，比如`test_a1+的+a1+，+a2+的+a2_1860.txt`；
+
+* 测试文件内部句子不作特殊处理；
+
+  ```
+  ...
+  他认识的人干什么的都有，正道也有，邪道也有。
+  ...
+  ```
+
+
 
 **安装 Python Packages 依赖**
+
 ```shell script
 # Python 3+
 cd /path/to/project/
@@ -70,6 +98,17 @@ cd /path/to/project/scripts
 ```
 
 
+
+**模型下载**
+
+我们分别就Hades和Poseidon训练了两个模型，可以从下述链接下载得到：
+
+```shell script
+# 有效期限：2020-12-31
+https://disk.pku.edu.cn:443/link/771B3F193617058CB3AAEFCDDD281B58
+```
+
+其中，模型`model.bin.hades`表示Hades系统模型，模型`model.bin.poseidon`表示Poseidon系统模型。
 
 ### Usage
 
