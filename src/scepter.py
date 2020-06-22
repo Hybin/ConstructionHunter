@@ -261,29 +261,24 @@ class Scepter(object):
         var_spots = self.variables_spot(construction, sentence, expand)
 
         for cat, (left, right) in var_spots:
-            try:
-                text, modal = sentence[left:right][0:-1], sentence[left:right][-1]
+            text, modal = sentence[left:right][0:-1], sentence[left:right][-1]
 
-                nodes = tree_to_dict(self.processor.get_constituency(modal))
+            nodes = tree_to_dict(self.processor.get_constituency(modal))
+            for node in nodes:
+                for key, value in node.items():
+                    if (key == "u" or key == "y") and value == modal:
+                        words = tree_to_dict(self.processor.get_constituency(text))
 
-                for node in nodes:
-                    for key, value in node.items():
-                        if (key == "u" or key == "y") and value == modal:
-                            words = tree_to_dict(self.processor.get_constituency(text))
+                        target = tuple()
+                        for word in words:
+                            for c, w in word.items():
+                                if text.rfind(w) == len(text) - len(w):
+                                    target = (c, w)
 
-                            target = tuple()
-                            for word in words:
-                                for c, w in word.items():
-                                    if text.rfind(w) == len(text) - len(w):
-                                        target = (c, w)
-
-                            if modal not in self.conf.modal_particles or target[0] in ["n", "np"]:
-                                continue
-                            else:
-                                replace(sequence, right - 1, right, 1)
-            except IndexError:
-                print(var_spots, left, right, sentence)
-                exit(0)
+                        if modal not in self.conf.modal_particles or target[0] in ["n", "np"]:
+                            continue
+                        else:
+                            replace(sequence, right - 1, right, 1)
 
         return sequence
 
@@ -319,13 +314,15 @@ class Scepter(object):
         self.hermes.info("Block expansion of construction: " + str(expand))
         self.hermes.info("Structure similarity of construction: " + str(similarity))
 
-        sequences = list()
+        sequences, constructions = list(), list()
         self.hermes.info("Extract the features...")
         for sentence in tqdm(sentences, desc="Extracting"):
             sequence = list()
 
             construction = file.split(".")[0].split("_")[1]
             construction = self.get_cxn_form(sentence, construction)
+
+            constructions.append(construction)
 
             feature_constants = self._extract_constants(sentence, construction, expand)
             feature_variables = self._extract_variables(sentence, construction, expand)
@@ -341,7 +338,7 @@ class Scepter(object):
             sequence = npy.array(sequence).T
             sequences.append(sequence)
 
-        return sentences, npy.array(sequences)
+        return sentences, npy.array(sequences), constructions
 
     def cluster(self, file):
         """
@@ -350,7 +347,7 @@ class Scepter(object):
         :param file: str
         :return: samples: list[list[tuple]]
         """
-        sentences, sequences = self.extract(file)
+        sentences, sequences, constructions = self.extract(file)
 
         samples = list()
         for sentence, sequence in zip(sentences, sequences):
@@ -362,7 +359,24 @@ class Scepter(object):
             sample = [(word, label) for word, label in zip(sentence, labels)]
             samples.append(sample)
 
-        return samples
+        return samples, constructions
 
-    def annotate(self, file, samples):
-        pass
+    def transform(self, file):
+        """ Transform the labels of the clusters to that of the elements of constructions
+
+        :param file: str
+        :return: samples: list[list[tuple]]
+        """
+        samples, constructions = self.cluster(file)
+
+        sequences = list()
+        for sample, construction in zip(samples, constructions):
+            labels = judge(sample, construction)
+
+            sequence = list()
+            for word, label in sample:
+                sequence.append((word, labels[label]))
+
+            sequences.append(sequence)
+
+        return sequences

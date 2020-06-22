@@ -449,3 +449,36 @@ def xor(a, b):
         sequence[i] = a[i] ^ b[i]
 
     return sequence
+
+
+def judge(sequence, construction):
+    """
+    Judge the property of the cluster label
+
+    :param sequence: list[tuple]
+    :param construction: str
+    :return: labels: dict
+    """
+    labels = dict()
+
+    candidates = dict()
+    for word, label in sequence:
+        if word in construction:
+            if label not in candidates.keys():
+                candidates[label] = 0
+            candidates[label] += 1
+
+        if word in ["。", "...", "？", "！"]:
+            labels[label] = "O"
+
+    constant, higher = 0, 0
+    for label, score in candidates.items():
+        higher, constant = (score, label) if score > higher else (higher, constant)
+
+    labels[constant] = "C"
+
+    for label in [0, 1, 2]:
+        if label not in labels.keys():
+            labels[label] = "V"
+
+    return labels

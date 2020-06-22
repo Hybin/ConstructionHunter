@@ -23,6 +23,14 @@
 
 
 ### Preparation
+**训练数据命名规范**
+
+对于每一个训练语料文件，将其命名为`training_[construction]_[id].txt`，比如`training_a+上+加+a_0219.txt`；
+
+**测试(待标注)数据命名规范**
+
+对于每一个测试语料文件，将其命名为`test_[construction]_[id].txt`，比如`test_a1+的+a1+，+a2+的+a2_1860.txt`；
+
 **安装 Python Packages 依赖**
 ```shell script
 # Python 3+
@@ -58,7 +66,7 @@ https://github.com/ymcui/Chinese-BERT-wwm#%E4%B8%AD%E6%96%87%E6%A8%A1%E5%9E%8B%E
 
 ```shell script
 cd /path/to/project/scripts
-
+./start-core-nlp-server.sh
 ```
 
 
