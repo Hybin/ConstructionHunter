@@ -298,11 +298,12 @@ class Processor(object):
 
         return test_data
 
-    def process(self, file):
+    def process(self, file, belonging):
         """
         Extract the feature: words, constants and variables from test data
 
-        :param file: string
+        :param file: str
+        :param belonging: dict
         :return: sequences: list[tuple]
         """
         data = self.load_test_data(file)
@@ -311,10 +312,14 @@ class Processor(object):
             word_index = pickle.load(fp)
         fp.close()
 
+        construction = file.split(".")[0].split("_")[1]
+
         sequences = []
         for sentence in data:
             indice, sequence = [], [0] * len(sentence)
             text = "".join(sentence)
+
+            belonging[text] = construction
 
             # Extract the features of constant and variable
             segments = self.cut_sentence(text, constants)
@@ -329,7 +334,7 @@ class Processor(object):
 
             sequences.append((sentence, indice, sequence))
 
-        return sequences
+        return sequences, belonging
 
     # ======================================
     # Process the data of Poseidon
@@ -354,25 +359,28 @@ class Processor(object):
             sequences.append((construction, sentence, sample))
         return sequences
 
-    def surfing(self, file):
+    def surfing(self, file, belonging):
         """
         Process the test data for poseidon
 
-        :param file: string
+        :param file: str
+        :param belonging: dict
         :return: sequence: list
         """
         # Load the test data
         data = self.load_test_data(file)
 
         # Get the construction
-        construction = "".join(file.split(".")[0].split("_")[1].split("+"))
+        cxn_form = file.split(".")[0].split("_")[1]
+        construction = "".join(cxn_form.split("+"))
 
         sequences = list()
         for record in data:
             sentence = "".join(record)
+            belonging[sentence] = cxn_form
             sequences.append((construction, sentence))
 
-        return sequences
+        return sequences, belonging
 
     # ======================================
     # Deal
@@ -399,12 +407,14 @@ class Processor(object):
 
         :return: sequences: list[tuple]
         """
-        sequences = []
+        sequences, belonging = [], {}
         files = os.listdir(self.conf.test_data_dir)
         for file in tqdm(files, desc="Process the test data"):
             if system == "hades":
-                sequences += self.process(file)
+                sequence, belonging = self.process(file, belonging)
+                sequences += sequence
             elif system == "poseidon":
-                sequences += self.surfing(file)
+                sequence, belonging = self.surfing(file, belonging)
+                sequences += sequence
 
-        return sequences
+        return sequences, belonging

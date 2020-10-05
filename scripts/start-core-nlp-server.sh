@@ -1,8 +1,8 @@
 #!/bin/bash
 
-root='/Users/hybin/Documents/Code/PycharmProjects/ConstructionHunter//libraries/stanford-corenlp/'
-log='/Users/hybin/Documents/Code/PycharmProjects/ConstructionHunter//log/CoreNLP_log.txt'
-pid='/Users/hybin/Documents/Code/PycharmProjects/ConstructionHunter//log/CoreNLP_pid.txt'
+root='/Users/hybin/Documents/Code/PycharmProjects/ConstructionHunter/libraries/stanford-corenlp/'
+log='/Users/hybin/Documents/Code/PycharmProjects/ConstructionHunter/log/CoreNLP_log.txt'
+pid='/Users/hybin/Documents/Code/PycharmProjects/ConstructionHunter/log/CoreNLP_pid.txt'
 
 # Go to the directory of CoreNLP Server
 cd $root

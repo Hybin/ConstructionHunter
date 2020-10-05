@@ -96,7 +96,7 @@ https://github.com/ymcui/Chinese-BERT-wwm#%E4%B8%AD%E6%96%87%E6%A8%A1%E5%9E%8B%E
 cd /path/to/project/scripts
 ./start-core-nlp-server.sh
 ```
-
+需要注意的是，此处记得修改脚本内部路径，由于脚本内部路径采用的是绝对路径，因而需要针对本地资源所在位置修改相应的路径。
 
 
 **模型下载**
@@ -112,13 +112,48 @@ https://disk.pku.edu.cn:443/link/771B3F193617058CB3AAEFCDDD281B58
 
 ### Usage
 
-| 系统     | 模型                                   | 备注                      |
-| -------- | -------------------------------------- | ------------------------- |
-| Zeus     | 基于强知识驱动的复句型构式自动识别模型 | ````                      |
-| Poseidon | 基于Bert的复句型构式自动识别模型       |                           |
-| Hades    | 基于Bi-LSTM的复句型构式自动识别模型    | 要求管理员运行 / **sudo** |
-
-
+<table>
+    <tr>
+        <th>系统</th>
+        <th>模型</th>
+        <th>源代码</th>
+        <th>备注</th>
+    </tr>
+    <tr>
+        <td rowspan="2">Zeus</td>
+        <td rowspan="2">基于强知识驱动的复句型构式自动识别模型</td>
+        <td><code>zeus.py</code>: 训练 & 预测</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><code>scepter.py</code>: 特征预处理</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td rowspan="3">Poseidon</td>
+        <td rowspan="3">基于Bert的复句型构式自动识别模型</td>
+        <td><code>poseidon.py</code>: 训练 & 预测</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><code>trident.py</code>: 模型设计</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><code>dolphin.py</code>: 特征预处理</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td rowspan="2">Hades</td>
+        <td rowspan="2">基于Bi-LSTM的复句型构式自动识别模型</td>
+        <td><code>hades.py</code>: 训练 & 预测</td>
+        <td>要求管理员运行 / <strong>sudo</strong></td>
+    </tr>
+    <tr>
+        <td><code>sword.py</code>: 模型设计</td>
+        <td></td>
+    </tr>
+</table>
 
 **若使用基于强知识驱动的复句型构式自动识别模型：**
 

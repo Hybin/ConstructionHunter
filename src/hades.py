@@ -8,6 +8,7 @@ from seqeval.metrics import classification_report
 from utils import *
 import numpy as npy
 import pickle
+import datetime
 
 
 class Hades(object):
@@ -55,7 +56,7 @@ class Hades(object):
         Process the test data
         :return: x: np.array
         """
-        sequences = self.processor.up(system="hades")
+        sequences, belonging = self.processor.up(system="hades")
 
         sentences, word_feature, cxn_feature, max_len = [], [], [], 0
         for sentence, index, sequence in sequences:
@@ -77,7 +78,7 @@ class Hades(object):
         seq_features = npy.array(seq_features)
         x = merge(word_feature, seq_features)
 
-        return sentences, x
+        return sentences, x, belonging
 
     def train(self):
         """
@@ -157,7 +158,7 @@ class Hades(object):
         model = self.sword.draw()
 
         # Load the test data
-        sentences, x = self.process_test_data()
+        sentences, x, belonging = self.process_test_data()
         x_kanji, x_cxn = resolve(x)
 
         # Load the model
@@ -183,7 +184,8 @@ class Hades(object):
             for i in range(0, len_of_sentence):
                 result.append((sentence[i], labels[i]))
 
-            results.append(result)
+            construction = belonging["".join(sentence)]
+            results.append((construction, result))
 
             count += 1
 
@@ -194,11 +196,27 @@ class Hades(object):
     def write(self, results):
         self.hermes.info("Begin to write the annotation...")
 
-        with open(self.conf.output.format("hades"), "w") as fp:
-            for result in tqdm(results, desc="Write the data"):
-                for word, label in result:
-                    fp.write(word + "/" + label + "  ")
+        output = {}
+        for construction, result in results:
+            if construction not in output.keys():
+                output[construction] = []
 
-                fp.write("\n")
+            output[construction].append(txt_to_xml(result))
 
-        fp.close()
+        # Write the data to output file
+        today = datetime.date.today().__format__('%Y_%m_%d')
+        for construction, sentences in tqdm(output.items(), desc="Output the predictions"):
+            with open(self.conf.output.format("hades", today, construction), "w") as fp:
+                fp.write("<?xml version='1.0' encoding='UTF-8'?>" + "\r\n")
+                fp.write("<document>" + "\r\n")
+
+                for sentence in sentences:
+                    fp.write("\t" + sentence + "\r\n")
+
+                fp.write("</document>")
+
+            fp.close()
+
+        self.hermes.info("Begin to write the annotation...Finished!")
+
+

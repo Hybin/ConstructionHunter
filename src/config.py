@@ -1,3 +1,8 @@
+"""
+config.py
+---------------
+Transform the configuration with *.json format into Dict
+"""
 import json
 
 

@@ -4,6 +4,7 @@ from processor import Processor
 from tqdm import tqdm
 from utils import *
 import re
+import datetime
 
 
 class Poseidon(object):
@@ -104,15 +105,30 @@ class Poseidon(object):
         self.hermes.info("Load the model...finished!")
 
         # Load the test data
-        data = self.processor.up(system="poseidon")
+        sequences, belonging = self.processor.up(system="poseidon")
 
         # Activate the additional characters
-        addition = additional(data)
+        addition = additional(sequences)
 
-        with open(self.conf.output.format("poseidon"), "w", encoding="utf-8") as fp:
-            for construction, sentence in tqdm(data, desc="Predicting"):
-                sample = self.excavate(sentence, construction, tokenizer, pred_model, addition)
-                fp.write(construction + "\t" + sample + "\t" + sentence + "\n")
-        fp.close()
+        data = {}
+        for construction, sentence in tqdm(sequences, desc="Predicting"):
+            sample = self.excavate(sentence, construction, tokenizer, pred_model, addition)
+            if construction not in data.keys():
+                data[construction] = []
 
+            data[construction].append(mining(sample, sentence, construction))
 
+        self.hermes.info("Begin to write the annotation...Finished!")
+        today = datetime.date.today().__format__('%Y_%m_%d')
+        for construction, sentences in tqdm(data.items(), desc="Output the predictions"):
+            with open(self.conf.output.format("poseidon", today, construction), "w") as fp:
+                fp.write("<?xml version='1.0' encoding='UTF-8'?>" + "\r\n")
+                fp.write("<document>" + "\r\n")
+
+                for sentence in sentences:
+                    fp.write("\t" + sentence + "\r\n")
+
+                fp.write("</document>")
+            fp.close()
+
+        self.hermes.info("Begin to write the annotation...Finished!")

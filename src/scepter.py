@@ -1,8 +1,14 @@
+"""
+scepter.py
+----------------
+Preprocessing for Zeus
+"""
 from tqdm import tqdm
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from utils import *
 import numpy as npy
+import datetime
 
 
 class Scepter(object):
@@ -380,3 +386,27 @@ class Scepter(object):
             sequences.append(sequence)
 
         return sequences
+
+    def annotate(self, file, samples):
+        """Output the predictions
+
+        :param file: str
+        :param samples: list[list[tuple]]
+        :return: None
+        """
+        construction = file.split(".")[0].split("_")[1]
+
+        today = datetime.date.today().__format__('%Y_%m_%d')
+        with open(self.conf.output.format("zeus", today, construction), "w") as fp:
+            fp.write("<?xml version='1.0' encoding='UTF-8'?>" + "\r\n")
+            fp.write("<document>" + "\r\n")
+
+            for sample in samples:
+                sentence = pair_to_xml(sample)
+                fp.write("\t" + sentence + "\r\n")
+
+            fp.write("</document>")
+
+        fp.close()
+
+        return None

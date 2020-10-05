@@ -254,7 +254,7 @@
         "怎么+vp1+也+不+vp2": {
             "block_expansion": false,
             "structure_similarity": false,
-			"variants": ["iu"]
+			"variants": ["再+怎么+vp1+也+不+vp2"]
         },
         "第一+是+X+，+第二+是+X+，+第三+还+是+X": {
             "block_expansion": false,

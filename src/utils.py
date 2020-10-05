@@ -36,7 +36,7 @@ class Queue(object):
         return self.container[-1]
 
     def empty(self):
-        if len(self.container) ==  0:
+        if len(self.container) == 0:
             return True
         else:
             return False
@@ -482,3 +482,147 @@ def judge(sequence, construction):
             labels[label] = "V"
 
     return labels
+
+
+def txt_to_xml(sentence):
+    xml_string, content = "<sentence>{}</sentence>", ""
+
+    previous = ""
+    for word, label in sentence:
+        if label == "O":
+            if previous == "O" or previous == "":
+                content += word
+            else:
+                if previous == "B-C" or previous == "I-C":
+                    content += "</constant></cxn>" + word
+                elif previous == "B-V" or previous == "I-V":
+                    content += "</variable></cxn>" + word
+        elif label == "B-C":
+            if previous == "O" or previous == "":
+                content += "<cxn><constant>" + word
+            elif previous == "B-V" or previous == "I-V":
+                content += "</variable><constant>" + word
+            elif previous == "B-C" or previous == "I-C":
+                content += "</constant><constant>" + word
+        elif label == "I-C":
+            if previous == "O" or previous == "":
+                content += "<cxn><constant>" + word
+            elif previous == "B-V" or previous == "I-V":
+                content += "</variable><constant>" + word
+            elif previous == "B-C" or previous == "I-C":
+                content += word
+        elif label == "B-V":
+            if previous == "O" or previous == "":
+                content += "<cxn><variable>" + word
+            elif previous == "B-C" or previous == "I-C":
+                content += "</constant><variable>" + word
+            elif previous == "B-V" or previous == "I-V":
+                content += "</variable><variable>" + word
+        elif label == "I-V":
+            if previous == "O" or previous == "":
+                content += "<cxn><variable>" + word
+            elif previous == "B-C" or previous == "I-C":
+                content += "</constant><variable>" + word
+            elif previous == "B-V" or previous == "I-V":
+                content += word
+
+        previous = label
+
+    return xml_string.format(content)
+
+
+def mining(sample, sentence, construction):
+    """Annotate the sample of the sentence
+
+    :param sample: str
+    :param sentence: str
+    :param construction: str
+    :return: xml_string: str
+    """
+    xml_string = "<sentence>{}</sentence>"
+
+    if sample == construction:
+        return xml_string.format(sentence)
+
+    index = sentence.find(sample)
+    left, right = sentence[:index] + "<cxn>", "</cxn>" + sentence[index + len(sample):]
+
+    previous, constant, variable, components = "", "", "", ""
+    for element in sample:
+        if element in construction:
+            constant += element
+
+            if variable != "":
+                components += "<variable>" + variable + "</variable>"
+                variable = ""
+        else:
+            variable += element
+
+            if constant != "":
+                components += "<constant>" + constant + "</constant>"
+                constant = ""
+
+    if variable != "":
+        components += "<variable>" + variable + "</variable>"
+
+    if constant != "":
+        components += "<constant>" + constant + "</constant>"
+
+    return xml_string.format(left + components + right)
+
+
+def pair_to_xml(sample):
+    xml_string = "<sentence>{}</sentence>"
+
+    const_begin, var_begin, cxn_begin = False, False, False
+    content, previous = "", ""
+    for word, label in sample:
+        if label == "O":
+            if previous == "O" or previous == "":
+                content += word
+            else:
+                if previous == "C":
+                    content += "</constant></cxn>" + word
+                    const_begin = False
+                    cxn_begin = False
+                elif previous == "V":
+                    content += "</variable></cxn>" + word
+                    var_begin = False
+                    cxn_begin = False
+        elif label == "C":
+            if previous == "O" or previous == "":
+                content += "<cxn><constant>" + word
+                cxn_begin = True
+                const_begin = True
+            elif previous == "V":
+                content += "</variable><constant>" + word
+                var_begin = False
+                const_begin = True
+            elif previous == "C" or previous == "C":
+                content += word
+        elif label == "V":
+            if previous == "O" or previous == "":
+                content += "<cxn><variable>" + word
+                var_begin = True
+                cxn_begin = True
+            elif previous == "C":
+                content += "</constant><variable>" + word
+                const_begin = False
+                var_begin = True
+            elif previous == "V" or previous == "V":
+                content += word
+
+        previous = label
+
+    if var_begin:
+        content += "</variable>"
+
+    if const_begin:
+        content += "</constant>"
+
+    if cxn_begin:
+        content += "</cxn>"
+
+    print(sample, content)
+
+    return xml_string.format(content)

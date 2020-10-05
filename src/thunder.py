@@ -1,3 +1,8 @@
+"""
+thunder.py
+---------------
+Model configuration for BERT
+"""
 from keras_bert import load_trained_model_from_checkpoint, Tokenizer
 
 

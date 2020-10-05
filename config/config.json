@@ -11,7 +11,7 @@
     "model_path": "../model/model.bin.{}",
     "validate_set": "../data/validation/valid.{}.pk",
     "model_image": "../images/{}",
-    "output": "../data/output/output_{}.txt",
+    "output": "../data/output/{}/{}_{}.xml",
     "bert": {
         "config": "../libraries/chinese_roberta_wwm_large_ext_L-24_H-1024_A-16/bert_config.json",
         "checkpoint": "../libraries/chinese_roberta_wwm_large_ext_L-24_H-1024_A-16/bert_model.ckpt",

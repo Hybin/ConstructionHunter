@@ -1,3 +1,8 @@
+"""
+dolphin.py
+----------------
+Preprocessing for BERT
+"""
 from keras.preprocessing.sequence import pad_sequences
 from math import ceil
 from constants import MAX_SEQUENCE_LENGTH

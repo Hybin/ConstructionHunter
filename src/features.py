@@ -1,3 +1,7 @@
+"""
+features.py
+---------------
+Transform the features with *.json format into Dict"""
 from config import Config
 
 

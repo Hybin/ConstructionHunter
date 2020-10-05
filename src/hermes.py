@@ -1,3 +1,8 @@
+"""
+hermes.py
+----------------
+Create the logger
+"""
 from constants import *
 import logging
 

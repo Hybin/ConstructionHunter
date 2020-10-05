@@ -1,3 +1,8 @@
+"""
+sword.py
+---------------
+Model configuration for Bi-LSTM
+"""
 from keras import Model
 from keras.layers import LSTM, Embedding, Dense, TimeDistributed, Dropout, Bidirectional, Input, concatenate
 from keras.utils import plot_model

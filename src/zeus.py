@@ -31,22 +31,13 @@ class Zeus(object):
 
         data = list()
         for file in files:
-            samples = self.scepter.cluster(file)
+            samples = self.scepter.transform(file)
             data.append((file, samples))
 
         return data
 
     def predict(self):
-        data = self.process_test_data()
-
-        for file, samples in data:
-            for sample in samples:
-                for word, label in sample:
-                    print(word, label)
-
-    def write_to_xml(self):
-        """
-        Write the data to .xml file
+        """Write the data to .xml file
 
         :return: None
         """
@@ -55,4 +46,6 @@ class Zeus(object):
         for file, samples in tqdm(data, desc="Write to the .xml file"):
             self.scepter.annotate(file, samples)
 
-        return
+        return None
+
+
